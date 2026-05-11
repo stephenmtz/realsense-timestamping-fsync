@@ -1,0 +1,29 @@
+flowchart TD
+    FSYNC["MAX9296A\nFSYNC pulse"]
+    FSYNC -->|same rising edge| CAM_A["D457 Camera A\n/dev/video0"]
+    FSYNC -->|same rising edge| CAM_B["D457 Camera B\n/dev/video1"]
+    CAM_A -->|CSI-2| SRC_A["v4l2src\ndevice=/dev/video0"]
+    CAM_B -->|CSI-2| SRC_B["v4l2src\ndevice=/dev/video1"]
+    SRC_A --> CONV_A["nvvidconv\nCSI raw to NV12/RGBA"]
+    SRC_B --> CONV_B["nvvidconv\nCSI raw to NV12/RGBA"]
+    CONV_A --> MUX["nvstreammux\nbatch both cameras"]
+    CONV_B --> MUX
+    MUX --> TEE["tee\nsplit stream"]
+    TEE --> INFER["nvinfer\nTensorRT on Ampere GPU"]
+    TEE --> SINK["appsink\nGstBuffer callback"]
+    SINK -->|write_ptr % N| RB["/dev/shm ring buffer\nN slots FIFO"]
+    INFER -->|detection metadata| RB
+    RB -->|read_ptr % N| CONS["consumer\nfused frames and detections"]
+    RB -.->|slot structure| S1["hw_timestamp_us\ncam_id · sensor_type\nframe_number · ready\nRGB frame data\ndetection metadata"]
+    subgraph orin["AGX Orin 64GB"]
+        SRC_A
+        SRC_B
+        CONV_A
+        CONV_B
+        MUX
+        TEE
+        INFER
+        SINK
+        RB
+        CONS
+    end
