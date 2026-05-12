@@ -1,2 +1,0 @@
-https://dev.realsenseai.com/docs/d457-hardware-synchronization/
-https://realsenseai.com/wp-content/uploads/2025/09/Intel-RealSense-D400-Series-Datasheet-October-2025.pdf

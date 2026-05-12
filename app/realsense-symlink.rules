@@ -7,3 +7,4 @@ SUBSYSTEM=="video4linux", ENV{ID_V4L_PRODUCT}=="vi-output, DS5 mux 64-001b", SYM
 SUBSYSTEM=="video4linux", ENV{ID_V4L_PRODUCT}=="vi-output, DS5 mux 65-001b", SYMLINK+="realsense2_rgb"
 SUBSYSTEM=="video4linux", ENV{ID_V4L_PRODUCT}=="vi-output, DS5 mux 66-001b", SYMLINK+="realsense2_ir_left"
 SUBSYSTEM=="video4linux", ENV{ID_V4L_PRODUCT}=="vi-output, DS5 mux 67-001b", SYMLINK+="realsense2_ir_right"
+
