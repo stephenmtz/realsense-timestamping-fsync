@@ -22,6 +22,7 @@ void RealSenseStream::configure_sync(const rs2::pipeline_profile& profile) {
 }
 
 void RealSenseStream::start() {
+    cfg_ = rs2::config();
     rs2::context ctx;
     auto devices = ctx.query_devices();
     for (auto dev : devices) {
