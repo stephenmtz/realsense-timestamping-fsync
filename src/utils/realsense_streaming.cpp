@@ -23,7 +23,7 @@ void RealSenseStream::configure_sync(const rs2::pipeline_profile& profile) {
 
 void RealSenseStream::start() {
     cfg_.enable_device(info_.serial);
-    cfg_.enable_stream(RS2_STREAM_DEPTH, 1, 848, 480, RS2_FORMAT_Z16, 30);
+    cfg_.enable_stream(RS2_STREAM_COLOR, -1, 848, 480, RS2_FORMAT_RGB8, 30);
 
     auto profile = pipe_.start(cfg_);
     pipe_started_ = true;
@@ -51,14 +51,15 @@ void RealSenseStream::stream_loop() {
             continue;
         }
 
-        auto depth = frames.get_depth_frame();
+        auto color = frames.get_color_frame();
+        if (!color) continue;
 
         std::cout << std::fixed << std::setprecision(3)
                   << "[" << info_.serial << "]"
-                  << "  frame="    << depth.get_frame_number()
-                  << "  depth_ts=" << depth.get_timestamp()
+                  << "  frame="    << color.get_frame_number()
+                  << "  color_ts=" << color.get_timestamp()
                   << "  domain="   << rs2_timestamp_domain_to_string(
-                                        depth.get_frame_timestamp_domain())
+                                        color.get_frame_timestamp_domain())
                   << "\n";
     }
 }
