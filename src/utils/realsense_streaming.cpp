@@ -22,14 +22,30 @@ void RealSenseStream::configure_sync(const rs2::pipeline_profile& profile) {
 }
 
 void RealSenseStream::start() {
+    rs2::context ctx;
+    auto devices = ctx.query_devices();
+    for (auto dev : devices) {
+        std::string serial = dev.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER);
+        if (serial == info_.serial) {
+            try {
+                auto depth_sensor = dev.first<rs2::depth_sensor>();
+                if (depth_sensor.supports(RS2_OPTION_INTER_CAM_SYNC_MODE)) {
+                    depth_sensor.set_option(RS2_OPTION_INTER_CAM_SYNC_MODE, 3);
+                    std::cout << "[" << info_.serial << "] sync mode set to 3\n";
+                }
+            } catch (const rs2::error& e) {
+                std::cerr << "[" << info_.serial << "] sync mode error: " << e.what() << "\n";
+            }
+            break;
+        }
+    }
+
     cfg_.enable_device(info_.serial);
     cfg_.enable_stream(RS2_STREAM_COLOR, -1, 848, 480, RS2_FORMAT_YUYV, 30);
     cfg_.enable_stream(RS2_STREAM_DEPTH, -1, 848, 480, RS2_FORMAT_Z16,  30);
 
     auto profile = pipe_.start(cfg_);
     pipe_started_ = true;
-
-    configure_sync(profile);
 
     running_ = true;
     thread_ = std::thread(&RealSenseStream::stream_loop, this);
