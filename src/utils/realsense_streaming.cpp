@@ -9,27 +9,28 @@ RealSenseStream::~RealSenseStream() {
     stop();
 }
 
-void RealSenseStream::configure_sync() {
-    auto depth_sensor = info_.device.first<rs2::depth_sensor>();
-
-    if (depth_sensor.supports(RS2_OPTION_INTER_CAM_SYNC_MODE)) {
-        depth_sensor.set_option(RS2_OPTION_INTER_CAM_SYNC_MODE, 3);
-        std::cout << "[" << info_.serial << "] inter cam sync mode set to 3 (external)\n";
-    } else {
-        std::cerr << "[" << info_.serial << "] sync mode not supported\n";
+void RealSenseStream::configure_sync(const rs2::pipeline_profile& profile) {
+    try {
+        auto depth_sensor = profile.get_device().first<rs2::depth_sensor>();
+        if (depth_sensor.supports(RS2_OPTION_INTER_CAM_SYNC_MODE)) {
+            depth_sensor.set_option(RS2_OPTION_INTER_CAM_SYNC_MODE, 3);
+            std::cout << "[" << info_.serial << "] sync mode set to 3\n";
+        }
+    } catch (const rs2::error& e) {
+        std::cerr << "[" << info_.serial << "] sync mode error: " << e.what() << "\n";
     }
 }
 
 void RealSenseStream::start() {
-    configure_sync();
-
     cfg_.enable_device(info_.serial);
-    cfg_.enable_stream(RS2_STREAM_DEPTH);
-    cfg_.enable_stream(RS2_STREAM_COLOR);
+    cfg_.enable_stream(RS2_STREAM_DEPTH, -1, -1, RS2_FORMAT_Z16,  -1);
+    cfg_.enable_stream(RS2_STREAM_COLOR, -1, -1, RS2_FORMAT_YUYV, -1);
 
-    pipe_.start(cfg_);
+    auto profile = pipe_.start(cfg_);
+    
+    configure_sync(profile);
+    
     running_ = true;
-
     thread_ = std::thread(&RealSenseStream::stream_loop, this);
     std::cout << "[" << info_.serial << "] streaming started\n";
 }
