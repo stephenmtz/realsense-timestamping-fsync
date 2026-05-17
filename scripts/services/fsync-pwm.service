@@ -1,0 +1,12 @@
+[Unit]
+Description=RealSense D457 FSYNC PWM Signal
+After=local-fs.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/bin/enable_fsync.sh
+ExecStop=/usr/local/bin/disable_fsync.sh
+
+[Install]
+WantedBy=multi-user.target
