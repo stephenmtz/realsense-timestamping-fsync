@@ -3,6 +3,8 @@
 #include <atomic>
 #include <csignal>
 #include <memory>
+#include <thread>
+#include <chrono>
 #include "utils/realsense_populating.h"
 #include "utils/realsense_streaming.h"
 
@@ -18,20 +20,28 @@ int main() {
     rs2::context ctx;
     auto cameras = enumerate_cameras(ctx);
 
-    std::vector<std::unique_ptr<RealSenseStream>> streams;
-    for (auto& cam : cameras)
-        streams.push_back(std::make_unique<RealSenseStream>(cam));
+    if (cameras.empty()) {
+        std::cerr << "No cameras found\n";
+        return 1;
+    }
 
-    for (auto& s : streams) {
-        s->start();
-        std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    }   
+    std::cout << "Testing single camera: " << cameras[0].serial << "\n";
 
-    while (running)
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    try {
+        RealSenseStream s(cameras[0]);
+        s.start();
 
-    for (auto& s : streams)
-        s->stop();
+        while (running)
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+        s.stop();
+    } catch (const rs2::error& e) {
+        std::cerr << "RealSense error: " << e.what() << "\n";
+        return 1;
+    } catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << "\n";
+        return 1;
+    }
 
     return 0;
 }

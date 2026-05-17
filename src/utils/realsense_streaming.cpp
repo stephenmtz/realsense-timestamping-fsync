@@ -23,13 +23,13 @@ void RealSenseStream::configure_sync(const rs2::pipeline_profile& profile) {
 
 void RealSenseStream::start() {
     cfg_.enable_device(info_.serial);
-    cfg_.enable_stream(RS2_STREAM_DEPTH, 1, 848, 480, RS2_FORMAT_Z16,  30);
-    cfg_.enable_stream(RS2_STREAM_COLOR, 1, 848, 480, RS2_FORMAT_RGB8, 30);
+    cfg_.enable_stream(RS2_STREAM_DEPTH, 1, 848, 480, RS2_FORMAT_Z16, 30);
 
     auto profile = pipe_.start(cfg_);
-    
-    configure_sync(profile);
-    
+    pipe_started_ = true;
+
+    // configure_sync(profile);  // disabled for now
+
     running_ = true;
     thread_ = std::thread(&RealSenseStream::stream_loop, this);
     std::cout << "[" << info_.serial << "] streaming started\n";
@@ -38,7 +38,10 @@ void RealSenseStream::start() {
 void RealSenseStream::stop() {
     running_ = false;
     if (thread_.joinable()) thread_.join();
-    pipe_.stop();
+    if (pipe_started_) {
+        pipe_.stop();
+        pipe_started_ = false;
+    }
     std::cout << "[" << info_.serial << "] stopped\n";
 }
 
@@ -51,15 +54,13 @@ void RealSenseStream::stream_loop() {
         }
 
         auto depth = frames.get_depth_frame();
-        auto color = frames.get_color_frame();
 
         std::cout << std::fixed << std::setprecision(3)
                   << "[" << info_.serial << "]"
-                  << "  frame="     << depth.get_frame_number()
-                  << "  depth_ts="  << depth.get_timestamp()
-                  << "  color_ts="  << color.get_timestamp()
-                  << "  domain="    << rs2_timestamp_domain_to_string(
-                                         depth.get_frame_timestamp_domain())
+                  << "  frame="    << depth.get_frame_number()
+                  << "  depth_ts=" << depth.get_timestamp()
+                  << "  domain="   << rs2_timestamp_domain_to_string(
+                                        depth.get_frame_timestamp_domain())
                   << "\n";
     }
 }
