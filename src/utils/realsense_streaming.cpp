@@ -29,6 +29,8 @@ void RealSenseStream::start() {
     auto profile = pipe_.start(cfg_);
     pipe_started_ = true;
 
+    configure_sync(profile);
+
     running_ = true;
     thread_ = std::thread(&RealSenseStream::stream_loop, this);
     std::cout << "[" << info_.serial << "] streaming started\n";
