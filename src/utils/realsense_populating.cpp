@@ -16,6 +16,7 @@ std::vector<CameraInfo> enumerate_cameras(const rs2::context& ctx) {
         info.serial           = dev.get_info(RS2_CAMERA_INFO_SERIAL_NUMBER);
         info.physical_port    = dev.get_info(RS2_CAMERA_INFO_PHYSICAL_PORT);
         info.firmware_version = dev.get_info(RS2_CAMERA_INFO_FIRMWARE_VERSION);
+        info.device           = dev;
 
         std::cout << "[enumerate] found camera"
                   << "  serial="   << info.serial

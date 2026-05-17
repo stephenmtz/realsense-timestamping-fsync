@@ -8,6 +8,7 @@ struct CameraInfo {
     std::string serial;
     std::string physical_port;
     std::string firmware_version;
+    rs2::device device; 
 };
 
 std::vector<CameraInfo> enumerate_cameras(const rs2::context& ctx);
