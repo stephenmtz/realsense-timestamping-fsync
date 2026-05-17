@@ -25,7 +25,7 @@ void RealSenseStream::start() {
 
     cfg_.enable_device(info_.serial);
     cfg_.enable_stream(RS2_STREAM_DEPTH);
-    cfg_.enable_stream(RS2_STREAM_COLOR);
+    cfg_.enable_stream(RS2_STREAM_COLOR, -1, -1, RS2_FORMAT_YUYV, -1);
 
     pipe_.start(cfg_);
     running_ = true;
