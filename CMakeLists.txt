@@ -9,6 +9,7 @@ find_package(realsense2 REQUIRED)
 add_executable(realsense_node
     src/main.cpp
     src/utils/realsense_populating.cpp
+    src/utils/realsense_streaming.cpp
 )
 
 target_include_directories(realsense_node PRIVATE src)
