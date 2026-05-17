@@ -23,6 +23,7 @@ void RealSenseStream::configure_sync(const rs2::pipeline_profile& profile) {
 
 void RealSenseStream::start() {
     cfg_.enable_device(info_.serial);
+    cfg_.enable_stream(RS2_STREAM_DEPTH, 1, 848, 480, RS2_FORMAT_Z16, 30);
 
     auto profile = pipe_.start(cfg_);
     pipe_started_ = true;
