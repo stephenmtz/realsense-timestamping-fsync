@@ -15,7 +15,7 @@ public:
 
 private:
     void stream_loop();
-    void configure_sync();
+    void configure_sync(const rs2::pipeline_profile& profile);
 
     CameraInfo        info_;
     rs2::pipeline     pipe_;
