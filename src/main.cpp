@@ -25,23 +25,28 @@ int main() {
         return 1;
     }
 
-    std::cout << "Testing single camera: " << cameras[0].serial << "\n";
+    std::vector<std::unique_ptr<RealSenseStream>> streams;
 
-    try {
-        RealSenseStream s(cameras[0]);
-        s.start();
-
-        while (running)
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-        s.stop();
-    } catch (const rs2::error& e) {
-        std::cerr << "RealSense error: " << e.what() << "\n";
-        return 1;
-    } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << "\n";
-        return 1;
+    for (auto& cam : cameras) {
+        try {
+            auto s = std::make_unique<RealSenseStream>(cam);
+            s->start();
+            streams.push_back(std::move(s));
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        } catch (const rs2::error& e) {
+            std::cerr << "[" << cam.serial << "] failed to start: " << e.what() << "\n";
+        } catch (const std::exception& e) {
+            std::cerr << "[" << cam.serial << "] error: " << e.what() << "\n";
+        }
     }
+
+    std::cout << streams.size() << "/" << cameras.size() << " cameras streaming\n";
+
+    while (running)
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    for (auto& s : streams)
+        s->stop();
 
     return 0;
 }
