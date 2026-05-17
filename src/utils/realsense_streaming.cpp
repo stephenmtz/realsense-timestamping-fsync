@@ -13,8 +13,8 @@ void RealSenseStream::configure_sync(const rs2::pipeline_profile& profile) {
     try {
         auto depth_sensor = profile.get_device().first<rs2::depth_sensor>();
         if (depth_sensor.supports(RS2_OPTION_INTER_CAM_SYNC_MODE)) {
-            depth_sensor.set_option(RS2_OPTION_INTER_CAM_SYNC_MODE, 3);
-            std::cout << "[" << info_.serial << "] sync mode set to 3\n";
+            depth_sensor.set_option(RS2_OPTION_INTER_CAM_SYNC_MODE, 2);
+            std::cout << "[" << info_.serial << "] sync mode set to 2\n";
         }
     } catch (const rs2::error& e) {
         std::cerr << "[" << info_.serial << "] sync mode error: " << e.what() << "\n";
