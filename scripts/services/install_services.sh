@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SERVICES_DIR="${SCRIPT_DIR}/services"
+SERVICES_DIR="${SCRIPT_DIR}"
 
 if [ $EUID -ne 0 ]; then
     echo "Error: must be run as root" >&2
