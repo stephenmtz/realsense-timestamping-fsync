@@ -22,8 +22,10 @@ int main() {
     for (auto& cam : cameras)
         streams.push_back(std::make_unique<RealSenseStream>(cam));
 
-    for (auto& s : streams)
+    for (auto& s : streams) {
         s->start();
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    }   
 
     while (running)
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
