@@ -1,5 +1,3 @@
-#include <realsense_streaming.h>
-
 #include "realsense_streaming.h"
 #include <iostream>
 #include <iomanip>
